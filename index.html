@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Verb Test - Finnish Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .difficulty-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .difficulty-btn:hover {
+            opacity: 0.9;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            background: #f5f5f5;
+            color: #999;
+            border-left: 4px solid #d0d0d0;
+            min-height: 110px;
+        }
+
+        .feedback-row {
+            margin-bottom: 8px;
+            min-height: 20px;
+        }
+
+        .feedback-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .feedback.correct {
+            background: #ecfdf5;
+            color: #10b981;
+            border-left: 4px solid #10b981;
+        }
+
+        .feedback.incorrect {
+            background: #fef2f2;
+            color: #ef4444;
+            border-left: 4px solid #ef4444;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            font-size: 15px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            opacity: 0.9;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-prev {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .results-container {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .score-circle .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .results-container h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .results-container p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .difficulty-selector {
+                flex-direction: column;
+            }
+
+            .difficulty-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Englannin verbitesti</h1>
+            <p>Suomalaisten synonyymien haaste</p>
+        </div>
+
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Helppo</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Keskitaso</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="questionsArea">
+            <!-- Questions will be inserted here -->
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="score-circle">
+                <span id="scorePercentage">0%</span>
+                <span class="score-label">Tulos</span>
+            </div>
+            <h2 id="resultMessage">Hyvä työ!</h2>
+            <p id="resultDetails">Vastasit oikein 0 / 12</p>
+            <button class="restart-btn" onclick="location.reload()">Ota testi uudelleen</button>
+        </div>
+
+        <div class="navigation" id="navigationArea">
+            <button class="nav-btn btn-prev" onclick="previousQuestion()" id="prevBtn">← Edellinen</button>
+            <button class="nav-btn btn-next" onclick="nextQuestion()" id="nextBtn">Seuraava →</button>
+        </div>
+    </div>
+
+    <script>
+        const testData = {
+            easy: [
+                { question: "deserve", options: ["pyytää", "vaatia", "ansaita", "odottaa"], correct: 2, finnishSynonyms: "ansaita, saada, palkita", definitions: { 0: "ask, request", 1: "demand, require", 2: "earn, merit", 3: "wait, expect" } },
+                { question: "allow", options: ["kieltää", "sallia", "määrätä", "vaatia"], correct: 1, finnishSynonyms: "sallia, suostua, hyväksyä", definitions: { 0: "refuse, deny", 1: "permit, let", 2: "order, prescribe", 3: "demand, require" } },
+                { question: "propose", options: ["käskeä", "väittää", "myöntää", "ehdottaa"], correct: 3, finnishSynonyms: "ehdottaa, tarjota, esittää", definitions: { 0: "command, order", 1: "claim, assert", 2: "admit, acknowledge", 3: "suggest, offer" } },
+                { question: "threaten", options: ["varoittaa", "hyökätä", "haukkua", "uhata"], correct: 3, finnishSynonyms: "uhata, puhua uhkaavasti, pelotella", definitions: { 0: "warn, caution", 1: "attack, assault", 2: "scold, insult", 3: "menace, intimidate" } },
+                { question: "praise", options: ["kannustaa", "kannattaa", "suositella", "kehua"], correct: 3, finnishSynonyms: "kehua, ylistää, kiittää", definitions: { 0: "encourage, motivate", 1: "support, favor", 2: "recommend, suggest", 3: "compliment, commend" } },
+                { question: "encourage", options: ["kehottaa", "vaatia", "kannustaa", "tuottaa"], correct: 2, finnishSynonyms: "kannustaa, rohkaista, innostaa", definitions: { 0: "urge, prompt", 1: "demand, require", 2: "motivate, inspire", 3: "produce, generate" } },
+                { question: "inform", options: ["kuulla", "selittää", "tiedottaa", "opettaa"], correct: 2, finnishSynonyms: "tiedottaa, ilmoittaa, kertoa", definitions: { 0: "hear, listen", 1: "explain, clarify", 2: "notify, report", 3: "teach, instruct" } },
+                { question: "protect", options: ["suojata", "vahvistaa", "pelastaa", "estää"], correct: 0, finnishSynonyms: "suojata, varjella, turvata", definitions: { 0: "shield, safeguard", 1: "strengthen, fortify", 2: "rescue, save", 3: "prevent, stop" } },
+                { question: "achieve", options: ["yrittää", "kilpailla", "saavuttaa", "epäonnistua"], correct: 2, finnishSynonyms: "saavuttaa, päästä, voittaa", definitions: { 0: "try, attempt", 1: "compete, rival", 2: "accomplish, attain", 3: "fail" } },
+                { question: "develop", options: ["kasvaa", "kehittää", "muuttua", "edistyä"], correct: 1, finnishSynonyms: "kehittää, luoda, omaksua", definitions: { 0: "grow, increase", 1: "create, evolve", 2: "change, transform", 3: "progress, advance" } },
+                { question: "convince", options: ["antaa", "pyytää", "vakuuttaa", "muistaa"], correct: 2, finnishSynonyms: "vakuuttaa, saada uskomaan, suostutella", definitions: { 0: "give, provide", 1: "ask, request", 2: "persuade, assure", 3: "remember, recall" } },
+                { question: "remind", options: ["neuvoa", "varoittaa", "opettaa", "muistuttaa"], correct: 3, finnishSynonyms: "muistuttaa, saada muistamaan, herätellä", definitions: { 0: "advise, counsel", 1: "warn, caution", 2: "teach, instruct", 3: "prompt, recall" } }
+            ],
+            medium: [
+                { question: "mediate", options: ["neuvotella", "sovitella", "väitellä", "selittää"], correct: 1, finnishSynonyms: "sovitella, väliintulia, ratkoa", definitions: { 0: "negotiate, bargain", 1: "arbitrate, settle", 2: "argue, dispute", 3: "explain, clarify" } },
+                { question: "deteriorate", options: ["romahtaa", "kieltäytyä", "heikkentyä", "parantua"], correct: 2, finnishSynonyms: "heikkentyä, huonontua, rappeutua", definitions: { 0: "collapse, crash", 1: "refuse, decline", 2: "decline, worsen", 3: "improve, recover" } },
+                { question: "advocate", options: ["varoittaa", "hyväksyä", "vastustaa", "kannattaa"], correct: 3, finnishSynonyms: "kannattaa, puolustaa, ajaa", definitions: { 0: "warn, caution", 1: "accept, approve", 2: "oppose, resist", 3: "promote, champion" } },
+                { question: "suppress", options: ["tukahduttaa", "salata", "myöntää", "julkaista"], correct: 0, finnishSynonyms: "tukahduttaa, sammuttaa, hillitä", definitions: { 0: "repress, quell", 1: "hide, conceal", 2: "admit, acknowledge", 3: "publish, release" } },
+                { question: "exaggerate", options: ["yksinkertaistaa", "liioitella", "pienentää", "tarkentaa"], correct: 1, finnishSynonyms: "liioitella, paisutella, yliarvioida", definitions: { 0: "simplify, reduce", 1: "overstate, amplify", 2: "diminish, reduce", 3: "refine, specify" } },
+                { question: "expand", options: ["supistaa", "jakaa", "laajentaa", "muuttaa"], correct: 2, finnishSynonyms: "laajentaa, levittää, kasvattaa", definitions: { 0: "contract, reduce", 1: "divide, share", 2: "enlarge, extend", 3: "change, alter" } },
+                { question: "consolidate", options: ["hajottaa", "korvata", "säilyttää", "yhdistää"], correct: 3, finnishSynonyms: "yhdistää, liittää, yhdentää", definitions: { 0: "scatter, disperse", 1: "replace, substitute", 2: "preserve, retain", 3: "unite, merge" } },
+                { question: "mitigate", options: ["lieventää", "pahentaa", "salata", "kunnioittaa"], correct: 0, finnishSynonyms: "lieventää, lievittää, helpottaa", definitions: { 0: "alleviate, ease", 1: "aggravate, worsen", 2: "hide, conceal", 3: "respect, honor" } },
+                { question: "fluctuate", options: ["pysyä", "vaihella", "nousta", "vähentyä"], correct: 1, finnishSynonyms: "vaihella, heilahdella, vaihdella", definitions: { 0: "remain, stay", 1: "vary, oscillate", 2: "rise, ascend", 3: "decrease, reduce" } },
+                { question: "obliterate", options: ["löytää", "soveltaa", "hävittää", "jatkaa"], correct: 2, finnishSynonyms: "hävittää, pyyhkiä, turmella", definitions: { 0: "find, discover", 1: "apply, use", 2: "erase, destroy", 3: "continue, proceed" } },
+                { question: "tolerate", options: ["kannustaa", "kieltää", "sietää", "palkita"], correct: 2, finnishSynonyms: "sietää, kestää, hyväksyä", definitions: { 0: "encourage, motivate", 1: "deny, refuse", 2: "endure, bear", 3: "reward, recompense" } },
+                { question: "revoke", options: ["vahvistaa", "siirtää", "säilyttää", "peruuttaa"], correct: 3, finnishSynonyms: "peruuttaa, mitätöidä, kumota", definitions: { 0: "confirm, affirm", 1: "transfer, move", 2: "preserve, keep", 3: "cancel, annul" } }
+            ]
+        };
+
+        let tests = {};
+
+        let currentDifficulty = 'easy';
+        let currentQuestion = 0;
+        let answers = [];
+        let testStarted = false;
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Initialize tests with shuffled answers
+        function initializeTests() {
+            tests = {
+                easy: testData.easy.map(q => ({
+                    ...q,
+                    original: q,
+                    shuffledOptions: shuffleArray(q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }))),
+                })),
+                medium: testData.medium.map(q => ({
+                    ...q,
+                    original: q,
+                    shuffledOptions: shuffleArray(q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }))),
+                }))
+            };
+        }
+
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            currentQuestion = 0;
+            answers = [];
+            testStarted = false;
+            
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const test = tests[currentDifficulty];
+            const questionsArea = document.getElementById('questionsArea');
+            const navArea = document.getElementById('navigationArea');
+            
+            if (testStarted === false && currentQuestion === 0) {
+                testStarted = true;
+            }
+
+            if (currentQuestion >= test.length) {
+                showResults();
+                navArea.style.display = 'none';
+                return;
+            }
+
+            const q = test[currentQuestion];
+            const totalQuestions = test.length;
+            const progressPercent = ((currentQuestion + 1) / totalQuestions) * 100;
+            
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+
+            let html = '';
+            for (let i = 0; i < test.length; i++) {
+                const isActive = i === currentQuestion;
+                const currentQ = test[i];
+                html += `
+                    <div class="question-container ${isActive ? 'active' : ''}">
+                        <div class="question-header">
+                            <div class="question-text">
+                                Mikä seuraavista tarkoittaa englannin verbiä<br>"<strong>${currentQ.question}</strong>":
+                            </div>
+                            <div class="question-number">${i + 1}/${totalQuestions}</div>
+                        </div>
+                        <div class="options">
+                            ${currentQ.shuffledOptions.map((optObj, idx) => {
+                                let className = 'option';
+                                if (answers[i] !== undefined) {
+                                    const userAnsweredCorrectIndex = optObj.originalIndex;
+                                    if (idx === answers[i]) {
+                                        className += userAnsweredCorrectIndex === currentQ.correct ? ' correct' : ' incorrect selected';
+                                    } else if (userAnsweredCorrectIndex === currentQ.correct) {
+                                        className += ' correct';
+                                    }
+                                    className += ' disabled';
+                                }
+                                return `
+                                    <div class="${className}" onclick="selectAnswer(${i}, ${idx})">
+                                        ${optObj.text}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="feedback ${answers[i] !== undefined ? (currentQ.shuffledOptions[answers[i]].originalIndex === currentQ.correct ? 'correct' : 'incorrect') : ''}">
+                            ${answers[i] !== undefined ? (
+                                currentQ.shuffledOptions[answers[i]].originalIndex === currentQ.correct 
+                                ? `<div class="feedback-row">✓ Oikein!</div><div class="feedback-row"><strong>${currentQ.question}</strong> = ${currentQ.finnishSynonyms}</div>`
+                                : `<div class="feedback-row">✗ Väärin.</div><div class="feedback-row"><strong>${currentQ.shuffledOptions[answers[i]].text}</strong> = ${currentQ.definitions[currentQ.shuffledOptions[answers[i]].originalIndex]}</div><div class="feedback-row">Oikea vastaus: <strong>${currentQ.question}</strong> = ${currentQ.finnishSynonyms}</div>`
+                            ) : '<div class="feedback-row">Valitse vaihtoehdoista →</div>'}
+                        </div>
+                    </div>
+                `;
+            }
+
+            questionsArea.innerHTML = html;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').disabled = false; // Always allow to proceed
+            document.getElementById('nextBtn').textContent = currentQuestion >= test.length - 1 ? 'Finish' : 'Next →';
+        }
+
+        function selectAnswer(questionIdx, optionIdx) {
+            if (answers[questionIdx] !== undefined) return; // Already answered
+            
+            answers[questionIdx] = optionIdx;
+            renderQuestion();
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            renderQuestion();
+        }
+
+        function showResults() {
+            const test = tests[currentDifficulty];
+            let correct = 0;
+            for (let i = 0; i < answers.length; i++) {
+                if (answers[i] !== undefined && test[i].shuffledOptions[answers[i]].originalIndex === test[i].correct) {
+                    correct++;
+                }
+            }
+            const percentage = Math.round((correct / test.length) * 100);
+            
+            document.getElementById('questionsArea').style.display = 'none';
+            document.getElementById('resultsContainer').classList.add('show');
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage === 100) {
+                message = 'Täydellinen! 🎉';
+            } else if (percentage >= 80) {
+                message = 'Erinomainen! 🌟';
+            } else if (percentage >= 60) {
+                message = 'Hyvä työ! 👍';
+            } else if (percentage >= 40) {
+                message = 'Jatka harjoittelua! 💪';
+            } else {
+                message = 'Jatka oppimista! 📚';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDetails').textContent = `Vastasit oikein ${correct} / ${test.length}`;
+        }
+
+        // Initialize
+        initializeTests();
+        renderQuestion();
+    </script>
+</body>
+</html>
+
