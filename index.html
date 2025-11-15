@@ -499,7 +499,7 @@
             // Update navigation buttons
             document.getElementById('prevBtn').disabled = currentQuestion === 0;
             document.getElementById('nextBtn').disabled = false; // Always allow to proceed
-            document.getElementById('nextBtn').textContent = currentQuestion >= test.length - 1 ? 'Finish' : 'Next →';
+            document.getElementById('nextBtn').textContent = currentQuestion >= test.length - 1 ? 'Valmis →' : 'Seuraava →';
         }
 
         function selectAnswer(questionIdx, optionIdx) {
@@ -558,4 +558,5 @@
     </script>
 </body>
 </html>
+
 
